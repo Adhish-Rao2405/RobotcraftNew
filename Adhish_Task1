@@ -1,0 +1,101 @@
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+
+class Position {
+private:
+    int x, y;
+
+public:
+    Position(int x = 0, int y = 0) : x(x), y(y) {}
+
+    void print() const {
+        std::cout << "Robot Position: x = " << x << ", y = " << y << std::endl;
+    }
+
+    float distanceTo(const Position& other) const {
+        int dx = x - other.x;
+        int dy = y - other.y;
+        return std::sqrt(dx * dx + dy * dy);
+    }
+};
+
+// a. Print a Position's coordinates (using pointer)
+void PrintPosition(const Position* p) {
+    if (p) {
+        p->print();
+    }
+}
+
+// b. Create a Position on the heap
+Position* CreatePosition(int x, int y) {
+    return new Position(x, y);
+}
+
+// c. Destroy a Position and set pointer to null
+void DestroyPosition(Position*& p) {
+    if (p) {
+        delete p;
+        p = nullptr;
+    }
+}
+
+// d. Calculate distance between two Positions
+float DistancePositions(const Position* robot, const Position* target) {
+    if (!robot || !target) return 0.0f;
+    return robot->distanceTo(*target);
+}
+
+// e. Generate array of Position pointers
+Position** GenerateArrayOfPositions(int N) {
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    Position** arr = new Position*[N];
+    for (int i = 0; i < N; ++i) {
+        arr[i] = new Position(std::rand() % 11, std::rand() % 11);
+    }
+    return arr;
+}
+
+// f. Destroy array of Position pointers
+void DestroyArrayOfPositions(Position**& arr, int N) {
+    if (!arr) return;
+
+    for (int i = 0; i < N; ++i) {
+        DestroyPosition(arr[i]);
+    }
+    delete[] arr;
+    arr = nullptr;
+}
+
+int main() {
+    // Test CreatePosition and PrintPosition
+    Position* robot = CreatePosition(1, 3);
+    Position* target = CreatePosition(2, 5);
+    PrintPosition(robot);
+    PrintPosition(target);
+
+    // Test DistancePositions
+    std::cout << "Distance: " << DistancePositions(robot, target) << std::endl;
+
+    // Test GenerateArrayOfPositions
+    int N = 3;
+    Position** positions = GenerateArrayOfPositions(N);
+    std::cout << "\nRandom Positions:\n";
+    for (int i = 0; i < N; ++i) {
+        PrintPosition(positions[i]);
+    }
+
+    // Test destruction functions
+    std::cout << "\nDeleting...\n";
+    DestroyPosition(robot);
+    DestroyPosition(target);
+    DestroyArrayOfPositions(positions, N);  // Must pass size N for array
+
+    // Verify null pointers after deletion
+    std::cout << "\nPointers after deletion:\n";
+    std::cout << "robot: " << robot << "\ntarget: " << target
+              << "\npositions: " << positions << std::endl;
+
+    return 0;
+}
